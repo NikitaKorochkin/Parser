@@ -15,19 +15,17 @@ import java.util.Map;
 @Service
 public class Parser {
 
-    Model model;
+    private static final Gson GSON = new Gson();
 
-    @Scheduled(fixedRate = 10_000)
+    @Scheduled(fixedRateString = "${fonbet.parser.frequency.ms}")
     public void getModel() {
-        Gson gson = new Gson();
         try {
-            long start = System.currentTimeMillis();
             String liveJson = Jsoup.connect("https://line31.bkfon-resources.com/line/mobile/showEvents?sysId=2&lang=ru&scopeMarket=1600&lineType=live_line&skId=1")
                     .ignoreContentType(true)
                     .execute()
                     .body();
             System.out.println("Connected");
-            model = gson.fromJson(liveJson, Model.class);
+            Model model = GSON.fromJson(liveJson, Model.class);
             Map<Event, List<Event>> finalMap = model.getResult();
             System.out.println(finalMap);
         } catch (IOException e) {
